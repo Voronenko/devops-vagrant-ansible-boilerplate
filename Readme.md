@@ -57,3 +57,15 @@ which share common approach with both Vagrant and Terraform provisioners, that a
 code organization for production deployment also.
 
 For terraform part check out https://github.com/Voronenko/devops-terraform-ansible-boilerplate
+
+
+For managing boxes, you can use repo manager like gilt
+
+```
+# https://gilt.readthedocs.io/en/latest/
+  - git: https://github.com/oops-to-devops/node-box.git
+    version: master
+    dst: deployment/provisioners/node-box/
+    post_commands:
+      - make
+```
