@@ -3,3 +3,4 @@ plans/
 .vagrant
 .idea
 cloudimg-console.log
+deployment/certs/*.pem
