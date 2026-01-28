@@ -1,4 +1,29 @@
 require 'yaml'
+require 'open3'
+require 'ipaddr'
+require 'json'
+
+#puts "Updating Vagrant vbguest plugin code to be compatible with Ruby 3.2.0 and later:"
+
+Dir.glob("#{Dir.home}/.vagrant.d/gems/**/vagrant-vbguest/hosts/virtualbox.rb") do |plugin_file|
+  puts "  #{plugin_file}"
+
+  unless File.writable?(plugin_file)
+    abort("Could not access plugin code file '#{plugin_file}'")
+  end
+
+  content = File.read(plugin_file)
+  updated_content = content.gsub(/File\.exists\?/, 'File.exist?')
+  File.write(plugin_file, updated_content)
+end
+
+# def generate_ip_addresses(base_ip_address, count)
+#   ip_address = IPAddr.new base_ip_address
+#   (1..count).map do |n|
+#     a, ip_address = ip_address.to_s, ip_address.succ
+#     a
+#   end
+# end
 
 # Cross-platform way of finding an executable in the $PATH.
 def which(cmd)
@@ -121,10 +146,17 @@ end
 
 # Return a list of all virtualhost server names and aliases from a config hash.
 def get_vhost_aliases(vconfig)
-  if vconfig['vm_webserver'] == 'apache'
-    aliases = get_apache_vhosts(vconfig['apache_vhosts'])
-  else
+  aliases = []
+  if vconfig['vm_webserver'].include?("nginx")
     aliases = get_nginx_vhosts(vconfig.fetch('nginx_hosts', vconfig['nginx_vhosts']))
+  elsif vconfig['vm_webserver'].include?("apache")
+    aliases = get_apache_vhosts(vconfig['apache_vhosts'])
+  elsif vconfig['vm_webserver'].include?("traefik")
+    aliases = vconfig['traefik_vhosts']
+  elsif vconfig['vm_webserver'].include?("kubernetes")
+    aliases = vconfig['kubernetes_vhosts']
+  else
+    puts "No webserver type specified"
   end
   aliases = aliases.uniq - [vconfig['vagrant_ip']]
   # Remove wildcard subdomains.
@@ -134,6 +166,7 @@ end
 # Return a default post_up_message.
 def get_default_post_up_message(vconfig)
   'Your VM Vagrant box is ready to use!'\
-    "\n* Visit the dashboard for an overview of your site: http://dashboard.#{vconfig['vagrant_hostname']} (or http://#{vconfig['vagrant_ip']})"\
+    "\n* Visit the dashboard for an overview of your site: http://tools.#{vconfig['vagrant_hostname']} (or http://#{vconfig['vagrant_ip']})"\
     "\n* You can SSH into your machine with `vagrant ssh`."\
 end
+

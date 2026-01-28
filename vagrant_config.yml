@@ -1,0 +1,63 @@
+# vagrant box add canonical/jammy64 https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64-vagrant.box
+vagrant_box: canonical/jammy64
+
+plugin_vbguest_auto_update: false
+
+
+vagrant_user: vagrant
+vagrant_synced_folder_default_type: nfs
+vagrant_gui: false
+
+# If you need to run multiple instances of VM, set a unique hostname,
+# machine name, and IP address for each instance.
+
+# on spin-up first nodes, than master
+# on halt - first master, than nodes
+vagrant_machines:
+  - vagrant_hostname: ubuntu.fiks.im
+    vagrant_machine_name: ubuntu
+    vagrant_ip: 192.168.56.91
+#    vagrant_public_ip: 192.168.56.71
+    vagrant_memory: 4096
+    vagrant_cpus: 2
+    vagrant_disk_size: 50GB
+
+# Allow VM to be accessed via a public network interface on your host.
+# Vagrant boxes are insecure by default, so be careful. You've been warned!
+# See: https://docs.vagrantup.com/v2/networking/public_network.html
+vagrant_public_ip: ""
+# Memory and CPU to use for this VM.
+vagrant_memory: 2048
+vagrant_cpus: 2
+
+# Ensure vagrant plugins are installed.
+vagrant_plugins:
+  - name: vagrant-vbguest
+  - name: vagrant-hostsupdater
+  - name: vagrant-disksize
+#  - name: vagrant-s3auth
+
+vagrant_synced_folders:
+  # The first synced folder will be used for the default installation
+  - local_path: .
+    destination: /ubuntu
+    type: nfs
+    create: true
+
+
+# The web server software to use. Can be either 'traefik', 'apache' or 'nginx'.
+vm_webserver: traefik
+
+apache_vhosts: []
+nginx_vhosts: []
+traefik_vhosts: []
+kubernetes_vhosts: []
+#  - app.fiks.im
+#  - api.fiks.im
+#  - whoami.fiks.im
+#  - docker.fiks.im
+#  - ftp.fiks.im
+#  - mailhog.fiks.im
+#  - traefik.fiks.im
+
+
